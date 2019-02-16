@@ -5,15 +5,31 @@ Run vm_subscriber.py in a separate terminal on your VM."""
 import paho.mqtt.client as mqtt
 import time
 
+
 def on_connect(client, userdata, flags, rc):
     print("Connected to server (i.e., broker) with result code "+str(rc))
+    #led, ultrasonic, button subscribing
+    client.subscribe("rpi-jaeishin/led")
+    client.subscribe("rpi-jaeishin/ultrasonic")
+    client.message_callback_add("rpi-jaeishin/ultrasonic",ultrasonicranges)
+    client.subscribe("rpi-jaeishin/button")
+    client.message_callback_add("rpi-jaeishin/button",buttons)
 
     #subscribe to the ultrasonic ranger topic here
 
 #Default message callback. Please use custom callbacks.
 def on_message(client, userdata, msg):
-    print("on_message: " + msg.topic + " " + str(msg.payload, "utf-8"))
+    print("on_message: " + msg.topic + " " + str(msg.payload, "utf-8")) 
 
+def ultrasonicranges(client, userdata, message):
+    #the third argument is 'message' here unlike 'msg' in on_message 
+    print("range: " + " "  + str(message.payload, "utf-8"))
+
+def buttons(client, userdata, message):
+    #the third argument is 'message' here unlike 'msg' in on_message 
+    print("range: " + " "  + str(message.payload, "utf-8"))
+   
+   
 if __name__ == '__main__':
     #this section is covered in publisher_and_subscriber_example.py
     client = mqtt.Client()
@@ -21,9 +37,10 @@ if __name__ == '__main__':
     client.on_connect = on_connect
     client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
     client.loop_start()
-
+    
     while True:
-        print("delete this line")
         time.sleep(1)
+
+	
             
 
